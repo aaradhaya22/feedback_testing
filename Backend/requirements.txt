@@ -31,3 +31,6 @@ tzdata==2025.1
 # JWT Authentication
 djangorestframework-simplejwt==5.5.1
 PyJWT==2.10.1
+
+# Database URL config for deployment
+dj-database-url==2.1.0
