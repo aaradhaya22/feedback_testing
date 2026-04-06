@@ -498,6 +498,17 @@ export default function AdminDashboard() {
                 setTableData(data);
                 setCurrentPage(data.page); // Update current page from server response
             } else {
+                setTableData(null);
+                
+                // If the error strictly resembles a token validation failure (401/SimpleJWT error object), force a logout.
+                if (data.code === 'token_not_valid' || (data.detail && String(data.detail).includes('token'))) {
+                    showToast('Session expired. Please log in again.', 'error');
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('user_role');
+                    router.push('/admin/login');
+                    return;
+                }
+                
                 showToast(data.error || 'Failed to load table data', 'error');
             }
         } catch (error) {
