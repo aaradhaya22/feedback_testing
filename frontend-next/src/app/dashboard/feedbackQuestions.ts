@@ -27,7 +27,7 @@ export const FEEDBACK_QUESTIONS: FeedbackQuestion[] = [
     },
     {
         key: 'q5',
-        label: 'Properly explains the problem practical before conduction',
+        label: 'Properly explains the problem with real world examples before conduction',
         category: 'Lecture'
     },
     {
@@ -37,7 +37,7 @@ export const FEEDBACK_QUESTIONS: FeedbackQuestion[] = [
     },
     {
         key: 'q7',
-        label: 'Shares study material, lesson plan, reference material through LMS',
+        label: 'Shares study material, lesson plan, reference material through LMS/other different sources',
         category: 'Lecture'
     },
     {
