@@ -273,12 +273,12 @@ export default function DashboardPage() {
                                 {/* Question Labels */}
                                 <div className="flex-1 py-4">
                                     {FEEDBACK_QUESTIONS.map((q, idx) => (
-                                        <div key={q.key} className="h-24 px-8 flex items-center border-b border-transparent">
+                                        <div key={q.key} className="h-16 px-8 flex items-center border-b border-transparent">
                                             <div className="flex items-start gap-4">
                                                 <span className="flex-shrink-0 h-6 w-6 rounded-lg bg-white border border-gray-200 text-blue-600 text-[11px] font-black flex items-center justify-center shadow-sm">
                                                     {(idx + 1).toString().padStart(2, '0')}
                                                 </span>
-                                                <p className="text-gray-700 text-[13px] font-semibold leading-snug">
+                                                <p className="text-gray-700 text-[12px] font-semibold leading-snug line-clamp-5">
                                                     {q.label}
                                                 </p>
                                             </div>
@@ -364,10 +364,10 @@ export default function DashboardPage() {
                                                     {FEEDBACK_QUESTIONS.map((q) => {
                                                         const currentVal = feedbacks[teacher.allocation_id]?.ratings[q.key] || 0;
                                                         return (
-                                                            <div key={q.key} className="h-24 flex items-center justify-center border-b border-gray-50/50 last:border-b-0 px-4">
-                                                                <div className="flex flex-col items-center w-full">
+                                                            <div key={q.key} className="h-16 flex items-center justify-center border-b border-gray-50/50 last:border-b-0 px-4">
+                                                                <div className="flex flex-col items-center">
                                                                     {/* Mobile Question Label (Hidden on Desktop) */}
-                                                                    <p className="md:hidden text-[11px] text-gray-500 font-bold mb-2 text-center whitespace-normal">{q.label}</p>
+                                                                    <p className="md:hidden text-[11px] text-gray-500 font-bold mb-2 text-center line-clamp-1">{q.label}</p>
                                                                     
                                                                     <div className="flex items-center gap-1">
                                                                         {[1, 2, 3, 4, 5].map((star) => (

@@ -6,12 +6,12 @@ import {
     Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis
 } from 'recharts';
 import { apiFetch } from '@/lib/api';
+import { FEEDBACK_QUESTIONS } from '@/app/dashboard/feedbackQuestions';
 import {
     TrendingUp, Users, Award, AlertCircle,
     Search, Download, Filter, RefreshCw, X, ChevronRight,
     Star, MessageSquare, BookOpen, Clock, Target, FileDown
 } from 'lucide-react';
-import { FEEDBACK_QUESTIONS } from '@/app/dashboard/feedbackQuestions';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import jsPDF from 'jspdf';
@@ -235,7 +235,7 @@ export default function PerformanceReport() {
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {[
                     { id: 'all', label: 'Total Teachers', value: summary?.total_teachers, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50', category: null },
                     { id: 'Excellent', label: 'Excellent', value: summary?.excellent, icon: Award, color: 'text-emerald-600', bg: 'bg-emerald-50', category: 'Excellent' },
