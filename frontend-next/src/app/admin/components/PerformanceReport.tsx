@@ -200,25 +200,20 @@ export default function PerformanceReport() {
         doc.setTextColor(30, 41, 59);
         doc.text("Performance Breakdown", 14, (doc as any).lastAutoTable.finalY + 15);
 
-        const parametersBody = Object.entries(teacher.question_stats).map(([key, value]) => {
-            const isOutlier = value < (teacher.average_rating - (teacher.std_deviation || 0));
-            return [
-                QUESTION_LABELS[key] || key,
-                value.toString(),
-                isOutlier ? 'Rejected (Outlier)' : 'Accepted'
-            ];
-        });
+        const parametersBody = Object.entries(teacher.question_stats).map(([key, value]) => [
+            QUESTION_LABELS[key] || key,
+            value.toString()
+        ]);
 
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 20,
-            head: [['Evaluation Parameter', 'Score (Out of 5)', 'Status']],
+            head: [['Evaluation Parameter', 'Score (Out of 5)']],
             body: parametersBody,
             headStyles: { fillColor: [79, 70, 229] }, // indigo-600
             alternateRowStyles: { fillColor: [249, 250, 251] },
             columnStyles: {
-                0: { cellWidth: 100 },
-                1: { cellWidth: 40, halign: 'center' },
-                2: { cellWidth: 40, halign: 'center' }
+                0: { cellWidth: 140 },
+                1: { cellWidth: 40, halign: 'center' }
             }
         });
 
