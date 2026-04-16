@@ -178,9 +178,10 @@ export default function PerformanceReport() {
             ];
         });
 
+        const deferredImages = new Map();
+
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 20,
-            margin: { top: 40 },
             head: [['ID', 'Full Name', 'Rating', 'Responses', 'Verdict']],
             body: tableBody,
             headStyles: { fillColor: [67, 56, 202] },
@@ -199,18 +200,31 @@ export default function PerformanceReport() {
             },
             didDrawCell: (data) => {
                 if (data.section === 'body' && data.column.index === 4) {
-                    if (data.cell.y < 50) return; // Prevent jspdf-autotable page-break ghost render bug (header is at Y=40, height 12, so valid cell>=52)
                     const rawStatus = (data.row.raw as string[])[4];
                     const imgB64 = rawStatus === 'TICK' ? TICK_IMG_B64 : (rawStatus === 'CROSS' ? CROSS_IMG_B64 : null);
                     if (imgB64) {
-                        const dim = 10;
-                        const imgX = data.cell.x + (data.cell.width / 2) - (dim / 2);
-                        const imgY = data.cell.y + (data.cell.height / 2) - (dim / 2);
-                        doc.addImage(imgB64, 'PNG', imgX, imgY, dim, dim);
+                        const pageNum = data.pageNumber || (doc.internal as any).getCurrentPageInfo().pageNumber;
+                        deferredImages.set(data.row.index, {
+                            pageNumber: pageNum,
+                            x: data.cell.x,
+                            y: data.cell.y,
+                            width: data.cell.width,
+                            height: data.cell.height,
+                            imgB64
+                        });
                     }
                 }
             }
         });
+
+        // Draw all captured images on their correct final layout coordinates
+        for (const imgData of Array.from(deferredImages.values())) {
+            doc.setPage(imgData.pageNumber);
+            const dim = 10;
+            const imgX = imgData.x + (imgData.width / 2) - (dim / 2);
+            const imgY = imgData.y + (imgData.height / 2) - (dim / 2);
+            doc.addImage(imgData.imgB64, 'PNG', imgX, imgY, dim, dim);
+        }
 
         doc.save(`Faculty_Performance_Report_${new Date().toISOString().split('T')[0]}.pdf`);
     };
@@ -274,9 +288,10 @@ export default function PerformanceReport() {
             ];
         });
 
+        const deferredImages = new Map();
+
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 20,
-            margin: { top: 40 },
             head: [['Evaluation Parameter', 'Score (Out of 5)', 'Verdict']],
             body: parametersBody,
             headStyles: { fillColor: [79, 70, 229] }, // indigo-600
@@ -294,18 +309,31 @@ export default function PerformanceReport() {
             },
             didDrawCell: (data) => {
                 if (data.section === 'body' && data.column.index === 2) {
-                    if (data.cell.y < 50) return; // Prevent jspdf-autotable page-break ghost render bug (header is at Y=40, height 12, so valid cell>=52)
                     const statusInfo = (data.row.raw as string[])[2];
                     const imgB64 = statusInfo === 'TICK' ? TICK_IMG_B64 : CROSS_IMG_B64;
                     if (imgB64) {
-                        const dim = 10;
-                        const imgX = data.cell.x + (data.cell.width / 2) - (dim / 2);
-                        const imgY = data.cell.y + (data.cell.height / 2) - (dim / 2);
-                        doc.addImage(imgB64, 'PNG', imgX, imgY, dim, dim);
+                        const pageNum = data.pageNumber || (doc.internal as any).getCurrentPageInfo().pageNumber;
+                        deferredImages.set(data.row.index, {
+                            pageNumber: pageNum,
+                            x: data.cell.x,
+                            y: data.cell.y,
+                            width: data.cell.width,
+                            height: data.cell.height,
+                            imgB64
+                        });
                     }
                 }
             }
         });
+
+        // Draw all captured images on their correct final layout coordinates
+        for (const imgData of Array.from(deferredImages.values())) {
+            doc.setPage(imgData.pageNumber);
+            const dim = 10;
+            const imgX = imgData.x + (imgData.width / 2) - (dim / 2);
+            const imgY = imgData.y + (imgData.height / 2) - (dim / 2);
+            doc.addImage(imgData.imgB64, 'PNG', imgX, imgY, dim, dim);
+        }
 
         doc.save(`Teacher_Report_${teacher.full_name.replace(/\s+/g, '_')}.pdf`);
     };
