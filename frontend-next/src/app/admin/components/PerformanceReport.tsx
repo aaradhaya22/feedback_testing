@@ -179,8 +179,8 @@ export default function PerformanceReport() {
 
     const handleExportTeacherPDF = async (teacher: TeacherStat) => {
         setLoading(true);
-        if (!TICK_IMG_B64) TICK_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/image/green%20tick.png");
-        if (!CROSS_IMG_B64) CROSS_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/image/cross.png");
+        if (!TICK_IMG_B64) TICK_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/New%20Folder/Green%20tick.png");
+        if (!CROSS_IMG_B64) CROSS_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/New%20Folder/cross.png");
         setLoading(false);
 
         const doc = new jsPDF();
