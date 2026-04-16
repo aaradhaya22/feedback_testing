@@ -198,6 +198,7 @@ export default function PerformanceReport() {
             },
             didDrawCell: (data) => {
                 if (data.section === 'body' && data.column.index === 4) {
+                    if (data.cell.y < 25) return; // Prevent jspdf-autotable page-break ghost render bug
                     const rawStatus = (data.row.raw as string[])[4];
                     const imgB64 = rawStatus === 'TICK' ? TICK_IMG_B64 : (rawStatus === 'CROSS' ? CROSS_IMG_B64 : null);
                     if (imgB64) {
@@ -291,6 +292,7 @@ export default function PerformanceReport() {
             },
             didDrawCell: (data) => {
                 if (data.section === 'body' && data.column.index === 2) {
+                    if (data.cell.y < 25) return; // Prevent jspdf-autotable page-break ghost render bug
                     const statusInfo = (data.row.raw as string[])[2];
                     const imgB64 = statusInfo === 'TICK' ? TICK_IMG_B64 : CROSS_IMG_B64;
                     if (imgB64) {
