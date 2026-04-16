@@ -184,6 +184,7 @@ export default function PerformanceReport() {
             body: tableBody,
             headStyles: { fillColor: [67, 56, 202] },
             alternateRowStyles: { fillColor: [248, 250, 252] },
+            styles: { minCellHeight: 12, valign: 'middle' },
             columnStyles: {
                 4: { halign: 'center' }
             },
@@ -200,7 +201,7 @@ export default function PerformanceReport() {
                     const rawStatus = (data.row.raw as string[])[4];
                     const imgB64 = rawStatus === 'TICK' ? TICK_IMG_B64 : (rawStatus === 'CROSS' ? CROSS_IMG_B64 : null);
                     if (imgB64) {
-                        const dim = 6;
+                        const dim = 10;
                         const imgX = data.cell.x + (data.cell.width / 2) - (dim / 2);
                         const imgY = data.cell.y + (data.cell.height / 2) - (dim / 2);
                         doc.addImage(imgB64, 'PNG', imgX, imgY, dim, dim);
@@ -277,6 +278,7 @@ export default function PerformanceReport() {
             body: parametersBody,
             headStyles: { fillColor: [79, 70, 229] }, // indigo-600
             alternateRowStyles: { fillColor: [249, 250, 251] },
+            styles: { minCellHeight: 12, valign: 'middle' },
             columnStyles: {
                 0: { cellWidth: 105 },
                 1: { cellWidth: 40, halign: 'center' },
@@ -292,7 +294,7 @@ export default function PerformanceReport() {
                     const statusInfo = (data.row.raw as string[])[2];
                     const imgB64 = statusInfo === 'TICK' ? TICK_IMG_B64 : CROSS_IMG_B64;
                     if (imgB64) {
-                        const dim = 6;
+                        const dim = 10;
                         const imgX = data.cell.x + (data.cell.width / 2) - (dim / 2);
                         const imgY = data.cell.y + (data.cell.height / 2) - (dim / 2);
                         doc.addImage(imgB64, 'PNG', imgX, imgY, dim, dim);
