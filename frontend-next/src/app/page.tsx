@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Lock, Calendar, ShieldCheck, ArrowRight, Laptop, GraduationCap, Loader2, Eye, EyeOff } from 'lucide-react';
+import { User, Lock, Calendar, ShieldCheck, ArrowRight, Laptop, GraduationCap, Loader2, Eye, EyeOff, BarChart3, Sparkles } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -24,6 +24,7 @@ function LoginContent() {
   const [role, setRole] = useState<'student' | 'admin'>('student');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   // Student Fields
   const [branch, setBranch] = useState('');
@@ -77,6 +78,10 @@ function LoginContent() {
 
   useEffect(() => {
     setMounted(true);
+
+    if (tokenFromUrl || searchParams.get('admin') === 'true') {
+       setShowLogin(true);
+    }
 
     // Auto-fill from URL if present
     if (branchFromUrl) setBranch(branchFromUrl);
@@ -195,7 +200,7 @@ function LoginContent() {
   if (!mounted) return null;
 
   return (
-    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-[#020617] text-slate-50 overflow-hidden font-sans">
+    <div className="min-h-screen w-full flex flex-col bg-[#020617] text-slate-50 overflow-hidden font-sans">
       <Toast
         message={toast.msg}
         type={toast.type}
@@ -204,236 +209,298 @@ function LoginContent() {
       />
 
       {/* Decorative Background Elements */}
-      <div className="fixed inset-0 pointer-events-none">
+      <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/20 rounded-full blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse delay-700" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03]" />
       </div>
 
-      {/* Left Section - Hero/Branding */}
-      <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative lg:w-1/2 flex flex-col justify-center px-8 lg:px-24 pb-24 pt-20 z-10"
-      >
-        <div className="mb-14">
-          <div className="bg-white inline-block px-6 py-4 rounded-3xl shadow-xl shadow-white/5 ring-1 ring-white/10">
-            <Image 
-                src="/images/AITR-logo.jpg" 
-                alt="AITR Logo" 
-                width={200} 
-                height={60} 
-                className="object-contain" 
-            />
-          </div>
-        </div>
+      <AnimatePresence mode="wait">
+        {!showLogin ? (
+          <motion.div
+            key="landing"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50, scale: 0.95 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            className="flex-1 flex flex-col items-center justify-center relative z-10 px-6 py-20 text-center w-full max-w-7xl mx-auto min-h-screen"
+          >
+            <div className="bg-white/10 p-3 rounded-[2rem] backdrop-blur-md border border-white/20 shadow-2xl mb-12 animate-bounce">
+               <Image src="/images/AITR-logo.jpg" alt="AITR Logo" width={180} height={50} className="object-contain rounded-2xl bg-white p-2" />
+            </div>
 
-        <h1 className="text-5xl lg:text-7xl font-extrabold mb-8 leading-tight">
-          Shape the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Future</span> of Education.
-        </h1>
-        <p className="text-xl text-slate-400 mb-12 max-w-lg leading-relaxed">
-          The Teacher Feedback System empowers students to provide constructive insights, helping our institution achieve excellence in teaching and learning.
-        </p>
+            <h1 className="text-6xl md:text-8xl font-black mb-8 tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 drop-shadow-lg leading-tight">
+               Elevate the Future of Learning.
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-slate-300 max-w-3xl mb-14 leading-relaxed font-medium">
+               The centralized **AITR Feedback Portal** empowers students to provide secure, anonymous insights to actively shape academic excellence across all departments.
+            </p>
 
-        <div className="grid grid-cols-2 gap-6 max-w-md">
-          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
-            <ShieldCheck className="text-blue-400 mb-4" size={28} />
-            <h4 className="font-bold text-white mb-2 text-lg">Secure</h4>
-            <p className="text-sm text-slate-400">Your feedback is anonymous and safely encrypted.</p>
-          </div>
-          <div className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
-            <Laptop className="text-indigo-400 mb-4" size={28} />
-            <h4 className="font-bold text-white mb-2 text-lg">Easy Access</h4>
-            <p className="text-sm text-slate-400">Provide your valuable insights anytime, anywhere.</p>
-          </div>
-        </div>
-      </motion.div>
+            <div className="flex flex-col sm:flex-row gap-6 mb-24 z-20">
+               <button
+                 onClick={() => { setRole('student'); setShowLogin(true); }}
+                 className="px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-2xl font-black text-lg shadow-[0_0_40px_-10px_rgba(79,70,229,0.7)] hover:shadow-[0_0_60px_-10px_rgba(79,70,229,0.9)] transition-all duration-300 transform hover:-translate-y-2 flex items-center justify-center gap-3 border border-indigo-400/30"
+               >
+                 <GraduationCap size={24} />
+                 Give Feedback / Login
+                 <ArrowRight size={20} className="animate-pulse" />
+               </button>
+               
+               <button
+                 onClick={() => { setRole('admin'); setShowLogin(true); }}
+                 className="px-10 py-5 bg-white/5 hover:bg-white/10 rounded-2xl font-bold text-lg backdrop-blur-md border border-white/10 transition-all duration-300 transform hover:-translate-y-2 flex items-center justify-center gap-3 text-slate-300 hover:text-white"
+               >
+                 <ShieldCheck size={24} />
+                 Admin Portal
+               </button>
+            </div>
 
-      {/* Right Section - Login Card */}
-      <div className="lg:w-1/2 flex items-start justify-center p-12 lg:pb-28 pt-24  z-10">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="w-full max-w-md bg-white/5 border border-white/10 backdrop-blur-2xl rounded-3xl p-10 lg:p-10 shadow-2xl relative"
-        >
-          {/* Subtle reflection effect */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-
-          <div className="mb-10 text-center">
-            <h2 className="text-3xl font-bold text-white mb-2">Welcome Login</h2>
-            {role === 'student' && !tokenFromUrl ? (
-              <p className="text-red-400 font-medium">Access token required. Please use the link provided by admin.</p>
-            ) : (
-              <p className="text-slate-400">Sign in to share your valuable feedback</p>
-            )}
-          </div>
-
-          <div className="flex mb-8 p-1 bg-white/5 rounded-2xl border border-white/10">
-            <button
-              onClick={() => setRole('student')}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all duration-300",
-                role === 'student'
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
-                  : "text-slate-400 hover:text-slate-200"
-              )}
-            >
-              <GraduationCap size={20} />
-              Student
-            </button>
-            <button
-              onClick={() => setRole('admin')}
-              className={cn(
-                "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all duration-300",
-                role === 'admin'
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
-                  : "text-slate-400 hover:text-slate-200"
-              )}
-            >
-              <ShieldCheck size={20} />
-              Admin
-            </button>
-          </div>
-
-          <AnimatePresence mode="wait">
-            <motion.form
-              key={role}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              onSubmit={handleLogin}
-              className="space-y-6"
-            >
-              <div className="space-y-5">
-                {role === 'student' ? (
-                  <>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-300 ml-1">Branch</label>
-                        <Select value={branch} onValueChange={setBranch} disabled={!!branchFromUrl}>
-                          <SelectTrigger className="bg-white/5 border-white/12 text-white focus:ring-blue-500/50">
-                            <SelectValue placeholder="Select Branch" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="CS">CS</SelectItem>
-                            <SelectItem value="IT">IT</SelectItem>
-                            <SelectItem value="DS">DS</SelectItem>
-                            <SelectItem value="AIML">AIML</SelectItem>
-                            <SelectItem value="CY">CY</SelectItem>
-                            <SelectItem value="CSIT">CSIT</SelectItem>
-                            <SelectItem value="EC">EC</SelectItem>
-                            <SelectItem value="CIVIL">CIVIL</SelectItem>
-                            <SelectItem value="MECHANICAL">MECHANICAL</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-300 ml-1">Year</label>
-                        <Select value={year} onValueChange={handleYearChange} disabled={!!yearFromUrl}>
-                          <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-blue-500/50">
-                            <SelectValue placeholder="Select Year" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="1">1st Year</SelectItem>
-                            <SelectItem value="2">2nd Year</SelectItem>
-                            <SelectItem value="3">3rd Year</SelectItem>
-                            <SelectItem value="4">4th Year</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-300 ml-1">Semester</label>
-                        <Select value={semester} onValueChange={handleSemesterChange} disabled={!!semesterFromUrl}>
-                          <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-blue-500/50">
-                            <SelectValue placeholder="Select Semester" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {(year ? YEAR_SEMESTER_MAP[year] : [1, 2, 3, 4, 5, 6, 7, 8]).map(s => (
-                              <SelectItem key={s} value={s.toString()}>{s}th Semester</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-semibold text-slate-300 ml-1">Section</label>
-                        <Select value={section} onValueChange={setSection} disabled={!!sectionFromUrl}>
-                          <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-blue-500/50">
-                            <SelectValue placeholder="Select Section" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[1, 2, 3, 4, 5].map(s => (
-                              <SelectItem key={s} value={s.toString()}>Section {s}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-300 ml-1">Admin Username</label>
-                      <Input
-                        type="text"
-                        placeholder="Enter Admin Username"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        icon={<ShieldCheck size={18} />}
-                        className="focus:border-blue-500/50"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-slate-300 ml-1">Password</label>
-                      <Input
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Enter Password"
-                        value={dob}
-                        onChange={(e) => setDob(e.target.value)}
-                        icon={<Lock size={18} />}
-                        rightElement={
-                          <button
-                            type="button"
-                            onClick={() => setShowPassword(!showPassword)}
-                            className="p-1 focus:outline-none flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity"
-                          >
-                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                          </button>
-                        }
-                        className="focus:border-blue-500/50"
-                        required
-                      />
-                    </div>
-                  </>
-                )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+               {[
+                 { title: "100% Anonymous", desc: "Your identity is heavily encrypted and structurally decoupled from your feedback.", icon: User, color: "text-blue-400", bg: "bg-blue-500/10" },
+                 { title: "Real-time Analytics", desc: "Live dynamic thresholds and comprehensive statistical metrics for HODs.", icon: BarChart3, color: "text-indigo-400", bg: "bg-indigo-500/10" },
+                 { title: "College-wide Impact", desc: "Every rating directly contributes to global benchmark adjustments.", icon: Sparkles, color: "text-purple-400", bg: "bg-purple-500/10" }
+               ].map((feature, i) => (
+                 <motion.div
+                   initial={{ opacity: 0, y: 20 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   transition={{ delay: 0.6 + (i * 0.2) }}
+                   key={i}
+                   className="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl hover:bg-white/10 transition-colors text-left group"
+                 >
+                   <div className={`p-4 rounded-2xl w-fit mb-6 ${feature.bg} ${feature.color} border border-white/5 group-hover:scale-110 transition-transform`}>
+                      <feature.icon size={28} />
+                   </div>
+                   <h3 className="text-2xl font-bold text-white mb-3">{feature.title}</h3>
+                   <p className="text-slate-400 font-medium leading-relaxed">{feature.desc}</p>
+                 </motion.div>
+               ))}
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="login"
+            initial={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, scale: 0.95, filter: "blur(10px)" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="flex-1 flex flex-col lg:flex-row w-full h-full min-h-screen relative z-10"
+          >
+            {/* Left Section - Hero/Branding */}
+            <div className="relative lg:w-1/2 flex flex-col justify-center px-8 lg:px-24 pb-24 pt-20 z-10">
+              <div className="mb-14">
+                <button onClick={() => setShowLogin(false)} className="bg-white/10 hover:bg-white/20 text-white inline-flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md transition-all font-bold border border-white/10 text-sm mb-6">
+                   ← Back to Home
+                </button>
+                <div className="bg-white inline-block px-6 py-4 rounded-3xl shadow-xl shadow-white/5 ring-1 ring-white/10">
+                  <Image src="/images/AITR-logo.jpg" alt="AITR Logo" width={200} height={60} className="object-contain" />
+                </div>
               </div>
 
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                className="w-full h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border-none group"
-                isLoading={loading}
-              >
-                <span className="flex items-center justify-center gap-2">
-                  {role === 'student' ? 'Sign In as Student' : 'Sign In as Admin'}
-                  {!loading && <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />}
-                </span>
-              </Button>
-            </motion.form>
-          </AnimatePresence>
+              <h1 className="text-5xl lg:text-7xl font-extrabold mb-8 leading-tight">
+                Shape the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400">Future</span> of Education.
+              </h1>
+              <p className="text-xl text-slate-400 mb-12 max-w-lg leading-relaxed">
+                The Teacher Feedback System empowers students to provide constructive insights, helping our institution achieve excellence in teaching and learning.
+              </p>
 
-          <p className="text-center text-slate-500 text-xs mt-10">
-            &copy; {new Date().getFullYear()} AITR feedback Portal. All rights reserved.
-          </p>
-        </motion.div>
-      </div>
+              <div className="grid grid-cols-2 gap-6 max-w-md">
+                <div className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
+                  <ShieldCheck className="text-blue-400 mb-4" size={28} />
+                  <h4 className="font-bold text-white mb-2 text-lg">Secure</h4>
+                  <p className="text-sm text-slate-400">Your feedback is anonymous and safely encrypted.</p>
+                </div>
+                <div className="p-5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors">
+                  <Laptop className="text-indigo-400 mb-4" size={28} />
+                  <h4 className="font-bold text-white mb-2 text-lg">Easy Access</h4>
+                  <p className="text-sm text-slate-400">Provide your valuable insights anytime, anywhere.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Section - Login Card */}
+            <div className="lg:w-1/2 flex items-start justify-center p-12 lg:pb-28 pt-24 z-10">
+              <div className="w-full max-w-md bg-white/5 border border-white/10 backdrop-blur-2xl rounded-3xl p-10 lg:p-10 shadow-2xl relative">
+                {/* Subtle reflection effect */}
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+                <div className="mb-10 text-center">
+                  <h2 className="text-3xl font-bold text-white mb-2">Welcome Login</h2>
+                  {role === 'student' && !tokenFromUrl ? (
+                    <p className="text-red-400 font-medium">Access token required. Please use the link provided by admin.</p>
+                  ) : (
+                    <p className="text-slate-400">Sign in to share your valuable feedback</p>
+                  )}
+                </div>
+
+                <div className="flex mb-8 p-1 bg-white/5 rounded-2xl border border-white/10">
+                  <button
+                    onClick={() => setRole('student')}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all duration-300",
+                      role === 'student'
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                        : "text-slate-400 hover:text-slate-200"
+                    )}
+                  >
+                    <GraduationCap size={20} />
+                    Student
+                  </button>
+                  <button
+                    onClick={() => setRole('admin')}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all duration-300",
+                      role === 'admin'
+                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                        : "text-slate-400 hover:text-slate-200"
+                    )}
+                  >
+                    <ShieldCheck size={20} />
+                    Admin
+                  </button>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  <motion.form
+                    key={role}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    onSubmit={handleLogin}
+                    className="space-y-6"
+                  >
+                    <div className="space-y-5">
+                      {role === 'student' ? (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-slate-300 ml-1">Branch</label>
+                              <Select value={branch} onValueChange={setBranch} disabled={!!branchFromUrl}>
+                                <SelectTrigger className="bg-white/5 border-white/12 text-white focus:ring-blue-500/50">
+                                  <SelectValue placeholder="Select Branch" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="CS">CS</SelectItem>
+                                  <SelectItem value="IT">IT</SelectItem>
+                                  <SelectItem value="DS">DS</SelectItem>
+                                  <SelectItem value="AIML">AIML</SelectItem>
+                                  <SelectItem value="CY">CY</SelectItem>
+                                  <SelectItem value="CSIT">CSIT</SelectItem>
+                                  <SelectItem value="EC">EC</SelectItem>
+                                  <SelectItem value="CIVIL">CIVIL</SelectItem>
+                                  <SelectItem value="MECHANICAL">MECHANICAL</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-slate-300 ml-1">Year</label>
+                              <Select value={year} onValueChange={handleYearChange} disabled={!!yearFromUrl}>
+                                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-blue-500/50">
+                                  <SelectValue placeholder="Select Year" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="1">1st Year</SelectItem>
+                                  <SelectItem value="2">2nd Year</SelectItem>
+                                  <SelectItem value="3">3rd Year</SelectItem>
+                                  <SelectItem value="4">4th Year</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-slate-300 ml-1">Semester</label>
+                              <Select value={semester} onValueChange={handleSemesterChange} disabled={!!semesterFromUrl}>
+                                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-blue-500/50">
+                                  <SelectValue placeholder="Select Semester" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {(year ? YEAR_SEMESTER_MAP[year] : [1, 2, 3, 4, 5, 6, 7, 8]).map(s => (
+                                    <SelectItem key={s} value={s.toString()}>{s}th Semester</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-semibold text-slate-300 ml-1">Section</label>
+                              <Select value={section} onValueChange={setSection} disabled={!!sectionFromUrl}>
+                                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-blue-500/50">
+                                  <SelectValue placeholder="Select Section" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {[1, 2, 3, 4, 5].map(s => (
+                                    <SelectItem key={s} value={s.toString()}>Section {s}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-slate-300 ml-1">Admin Username</label>
+                            <Input
+                              type="text"
+                              placeholder="Enter Admin Username"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              icon={<ShieldCheck size={18} />}
+                              className="focus:border-blue-500/50"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-semibold text-slate-300 ml-1">Password</label>
+                            <Input
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Enter Password"
+                              value={dob}
+                              onChange={(e) => setDob(e.target.value)}
+                              icon={<Lock size={18} />}
+                              rightElement={
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  className="p-1 focus:outline-none flex items-center justify-center opacity-70 hover:opacity-100 transition-opacity"
+                                >
+                                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
+                              }
+                              className="focus:border-blue-500/50"
+                              required
+                            />
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="lg"
+                      className="w-full h-14 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border-none group"
+                      isLoading={loading}
+                    >
+                      <span className="flex items-center justify-center gap-2">
+                        {role === 'student' ? 'Sign In as Student' : 'Sign In as Admin'}
+                        {!loading && <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />}
+                      </span>
+                    </Button>
+                  </motion.form>
+                </AnimatePresence>
+
+                <p className="text-center text-slate-500 text-xs mt-10">
+                  &copy; {new Date().getFullYear()} AITR feedback Portal. All rights reserved.
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
