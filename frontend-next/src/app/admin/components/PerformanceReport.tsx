@@ -47,6 +47,25 @@ interface Summary {
     global_question_stats?: Record<string, { mean: number; std: number; threshold: number }>;
 }
 
+let TICK_IMG_B64 = "";
+let CROSS_IMG_B64 = "";
+
+const loadBase64Image = async (url: string): Promise<string> => {
+    try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    } catch (e) {
+        console.error("Failed to load image", url, e);
+        return "";
+    }
+};
+
 const COLORS: Record<string, string> = {
     Excellent: '#10b981',
     Good: '#3b82f6',
@@ -158,7 +177,12 @@ export default function PerformanceReport() {
         doc.save(`Faculty_Performance_Report_${new Date().toISOString().split('T')[0]}.pdf`);
     };
 
-    const handleExportTeacherPDF = (teacher: TeacherStat) => {
+    const handleExportTeacherPDF = async (teacher: TeacherStat) => {
+        setLoading(true);
+        if (!TICK_IMG_B64) TICK_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/image/green%20tick.png");
+        if (!CROSS_IMG_B64) CROSS_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/image/cross.png");
+        setLoading(false);
+
         const doc = new jsPDF();
 
         // Header
@@ -204,7 +228,7 @@ export default function PerformanceReport() {
         const parametersBody = Object.entries(teacher.question_stats).map(([key, value]) => {
             const globalStat = summary?.global_question_stats?.[key];
             const threshold = globalStat ? globalStat.threshold : 0;
-            const statusLabel = value < threshold ? '❌' : '✅';
+            const statusLabel = value < threshold ? 'CROSS' : 'TICK';
             return [
                 QUESTION_LABELS[key] || key,
                 value.toString(),
@@ -222,6 +246,23 @@ export default function PerformanceReport() {
                 0: { cellWidth: 105 },
                 1: { cellWidth: 40, halign: 'center' },
                 2: { cellWidth: 35, halign: 'center' }
+            },
+            didParseCell: (data) => {
+                if (data.section === 'body' && data.column.index === 2) {
+                    data.cell.text = [''];
+                }
+            },
+            didDrawCell: (data) => {
+                if (data.section === 'body' && data.column.index === 2) {
+                    const statusInfo = (data.row.raw as string[])[2];
+                    const imgB64 = statusInfo === 'TICK' ? TICK_IMG_B64 : CROSS_IMG_B64;
+                    if (imgB64) {
+                        const dim = 6;
+                        const imgX = data.cell.x + (data.cell.width / 2) - (dim / 2);
+                        const imgY = data.cell.y + (data.cell.height / 2) - (dim / 2);
+                        doc.addImage(imgB64, 'PNG', imgX, imgY, dim, dim);
+                    }
+                }
             }
         });
 
