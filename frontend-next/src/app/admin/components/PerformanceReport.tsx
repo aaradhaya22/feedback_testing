@@ -238,7 +238,7 @@ export default function PerformanceReport() {
 
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 20,
-            head: [['Evaluation Parameter', 'Score (Out of 5)', 'Status']],
+            head: [['Evaluation Parameter', 'Score (Out of 5)', 'Verdict']],
             body: parametersBody,
             headStyles: { fillColor: [79, 70, 229] }, // indigo-600
             alternateRowStyles: { fillColor: [249, 250, 251] },
