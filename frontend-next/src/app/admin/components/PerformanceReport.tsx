@@ -125,7 +125,12 @@ export default function PerformanceReport() {
         }));
     };
 
-    const handleExportPDF = () => {
+    const handleExportPDF = async () => {
+        setLoading(true);
+        if (!TICK_IMG_B64) TICK_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/New%20Folder/green%20tick");
+        if (!CROSS_IMG_B64) CROSS_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/New%20Folder/cross");
+        setLoading(false);
+
         const doc = new jsPDF();
 
         // Add Title
@@ -158,20 +163,50 @@ export default function PerformanceReport() {
         // Detail Table
         doc.text("Detailed Scorecard", 14, (doc as any).lastAutoTable.finalY + 15);
 
-        const tableBody = filteredData.map(t => [
-            t.teacher_id,
-            t.full_name,
-            t.average_rating.toString(),
-            t.response_count.toString(),
-            t.category
-        ]);
+        const tableBody = filteredData.map(t => {
+            let verdictStatus = 'BLANK';
+            if (t.category === 'Need Improvement') verdictStatus = 'CROSS';
+            else if (t.category === 'Excellent' || t.category === 'Good') verdictStatus = 'TICK';
+            else verdictStatus = t.category;
+
+            return [
+                t.teacher_id,
+                t.full_name,
+                t.average_rating.toString(),
+                t.response_count.toString(),
+                verdictStatus
+            ];
+        });
 
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 20,
-            head: [['ID', 'Full Name', 'Rating', 'Responses', 'Status']],
+            head: [['ID', 'Full Name', 'Rating', 'Responses', 'Verdict']],
             body: tableBody,
             headStyles: { fillColor: [67, 56, 202] },
-            alternateRowStyles: { fillColor: [248, 250, 252] }
+            alternateRowStyles: { fillColor: [248, 250, 252] },
+            columnStyles: {
+                4: { halign: 'center' }
+            },
+            didParseCell: (data) => {
+                if (data.section === 'body' && data.column.index === 4) {
+                    const rawStatus = (data.row.raw as string[])[4];
+                    if (rawStatus === 'TICK' || rawStatus === 'CROSS') {
+                        data.cell.text = [''];
+                    }
+                }
+            },
+            didDrawCell: (data) => {
+                if (data.section === 'body' && data.column.index === 4) {
+                    const rawStatus = (data.row.raw as string[])[4];
+                    const imgB64 = rawStatus === 'TICK' ? TICK_IMG_B64 : (rawStatus === 'CROSS' ? CROSS_IMG_B64 : null);
+                    if (imgB64) {
+                        const dim = 6;
+                        const imgX = data.cell.x + (data.cell.width / 2) - (dim / 2);
+                        const imgY = data.cell.y + (data.cell.height / 2) - (dim / 2);
+                        doc.addImage(imgB64, 'PNG', imgX, imgY, dim, dim);
+                    }
+                }
+            }
         });
 
         doc.save(`Faculty_Performance_Report_${new Date().toISOString().split('T')[0]}.pdf`);
@@ -179,8 +214,8 @@ export default function PerformanceReport() {
 
     const handleExportTeacherPDF = async (teacher: TeacherStat) => {
         setLoading(true);
-        if (!TICK_IMG_B64) TICK_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/New%20Folder/Green%20tick.png");
-        if (!CROSS_IMG_B64) CROSS_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/New%20Folder/cross.png");
+        if (!TICK_IMG_B64) TICK_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/New%20Folder/green%20tick");
+        if (!CROSS_IMG_B64) CROSS_IMG_B64 = await loadBase64Image("https://ik.imagekit.io/nouse/New%20Folder/cross");
         setLoading(false);
 
         const doc = new jsPDF();
