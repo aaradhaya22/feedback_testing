@@ -225,7 +225,7 @@ function LoginContent() {
             transition={{ duration: 0.6, ease: "easeInOut" }}
             className="flex-1 flex flex-col items-center justify-center relative z-10 px-6 py-20 text-center w-full max-w-7xl mx-auto min-h-screen"
           >
-            <div className="bg-white/10 p-3 rounded-[2rem] backdrop-blur-md border border-white/20 shadow-2xl mb-12 animate-bounce">
+            <div className="bg-white/10 p-3 rounded-[2rem] backdrop-blur-md border border-white/20 shadow-2xl mb-12">
                <Image src="/images/AITR-logo.jpg" alt="AITR Logo" width={180} height={50} className="object-contain rounded-2xl bg-white p-2" />
             </div>
 
@@ -277,6 +277,10 @@ function LoginContent() {
                  </motion.div>
                ))}
             </div>
+
+            <div className="mt-auto pt-10 text-center text-slate-500 text-sm opacity-70">
+               &copy; {new Date().getFullYear()} AITR feedback Portal. All rights reserved.
+            </div>
           </motion.div>
         ) : (
           <motion.div
@@ -289,8 +293,8 @@ function LoginContent() {
           >
             {/* Left Section - Hero/Branding */}
             <div className="relative lg:w-1/2 flex flex-col justify-center px-8 lg:px-24 pb-24 pt-20 z-10">
-              <div className="mb-14">
-                <button onClick={() => setShowLogin(false)} className="bg-white/10 hover:bg-white/20 text-white inline-flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md transition-all font-bold border border-white/10 text-sm mb-6">
+              <div className="flex flex-col items-start gap-6 mb-14">
+                <button onClick={() => setShowLogin(false)} className="bg-white/10 hover:bg-white/20 text-white inline-flex items-center gap-2 px-4 py-2 rounded-xl backdrop-blur-md transition-all font-bold border border-white/10 text-sm">
                    ← Back to Home
                 </button>
                 <div className="bg-white inline-block px-6 py-4 rounded-3xl shadow-xl shadow-white/5 ring-1 ring-white/10">
