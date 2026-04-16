@@ -204,7 +204,7 @@ export default function PerformanceReport() {
         const parametersBody = Object.entries(teacher.question_stats).map(([key, value]) => {
             const globalStat = summary?.global_question_stats?.[key];
             const threshold = globalStat ? globalStat.threshold : 0;
-            const statusLabel = value < threshold ? 'X Need Improvement' : '✓ Good';
+            const statusLabel = value < threshold ? '❌' : '✅';
             return [
                 QUESTION_LABELS[key] || key,
                 value.toString(),
