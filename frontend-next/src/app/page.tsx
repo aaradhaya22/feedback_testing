@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Lock, Calendar, ShieldCheck, ArrowRight, Laptop, GraduationCap, Loader2, Eye, EyeOff, BarChart3, Sparkles } from 'lucide-react';
+import { User, Lock, Calendar, ShieldCheck, ArrowRight, Laptop, GraduationCap, Loader2, Eye, EyeOff, BarChart3, Sparkles, BookOpen, Link as LinkIcon, LogIn, Star, CheckCircle2, X } from 'lucide-react';
 import { apiFetch } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -25,6 +25,7 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showInstructions, setShowInstructions] = useState(false);
 
   // Student Fields
   const [branch, setBranch] = useState('');
@@ -237,26 +238,35 @@ function LoginContent() {
                The centralized **AITR Feedback Portal** empowers students to provide secure, anonymous insights to actively shape academic excellence across all departments.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-6 mb-24 z-20">
+            <div className="flex flex-col items-center gap-6 mb-24 z-20 w-full max-w-2xl mx-auto">
+               <div className="flex flex-col sm:flex-row gap-6 w-full">
+                 <button
+                   onClick={() => { setRole('student'); setShowLogin(true); }}
+                   className="flex-1 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-2xl font-black text-lg shadow-[0_0_40px_-10px_rgba(79,70,229,0.7)] hover:shadow-[0_0_60px_-10px_rgba(79,70,229,0.9)] transition-all duration-300 transform hover:-translate-y-2 flex items-center justify-center gap-3 border border-indigo-400/30 w-full"
+                 >
+                   <GraduationCap size={24} />
+                   Give Feedback / Login
+                   <ArrowRight size={20} className="animate-pulse" />
+                 </button>
+                 
+                 <button
+                   onClick={() => { setRole('admin'); setShowLogin(true); }}
+                   className="flex-1 py-5 bg-white/5 hover:bg-white/10 rounded-2xl font-bold text-lg backdrop-blur-md border border-white/10 transition-all duration-300 transform hover:-translate-y-2 flex items-center justify-center gap-3 text-slate-300 hover:text-white w-full"
+                 >
+                   <ShieldCheck size={24} />
+                   Admin Portal
+                 </button>
+               </div>
                <button
-                 onClick={() => { setRole('student'); setShowLogin(true); }}
-                 className="px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-2xl font-black text-lg shadow-[0_0_40px_-10px_rgba(79,70,229,0.7)] hover:shadow-[0_0_60px_-10px_rgba(79,70,229,0.9)] transition-all duration-300 transform hover:-translate-y-2 flex items-center justify-center gap-3 border border-indigo-400/30"
+                 onClick={() => setShowInstructions(true)}
+                 className="px-8 py-4 w-full sm:w-auto bg-white/5 hover:bg-slate-800/50 rounded-2xl font-bold text-lg backdrop-blur-md border border-white/10 transition-all duration-300 flex items-center justify-center gap-3 text-slate-400 hover:text-white"
                >
-                 <GraduationCap size={24} />
-                 Give Feedback / Login
-                 <ArrowRight size={20} className="animate-pulse" />
-               </button>
-               
-               <button
-                 onClick={() => { setRole('admin'); setShowLogin(true); }}
-                 className="px-10 py-5 bg-white/5 hover:bg-white/10 rounded-2xl font-bold text-lg backdrop-blur-md border border-white/10 transition-all duration-300 transform hover:-translate-y-2 flex items-center justify-center gap-3 text-slate-300 hover:text-white"
-               >
-                 <ShieldCheck size={24} />
-                 Admin Portal
+                 <BookOpen size={22} className="text-indigo-400" />
+                 Instructions for Feedback
                </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mb-10">
                {[
                  { title: "100% Anonymous", desc: "Your identity is heavily encrypted and structurally decoupled from your feedback.", icon: User, color: "text-blue-400", bg: "bg-blue-500/10" },
                  { title: "Real-time Analytics", desc: "Live dynamic thresholds and comprehensive statistical metrics for HODs.", icon: BarChart3, color: "text-indigo-400", bg: "bg-indigo-500/10" },
@@ -281,6 +291,67 @@ function LoginContent() {
             <div className="mt-auto pt-10 text-center text-slate-500 text-sm opacity-70">
                &copy; {new Date().getFullYear()} AITR feedback Portal. All rights reserved.
             </div>
+
+            {/* Instructions Modal */}
+            <AnimatePresence>
+              {showInstructions && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm"
+                >
+                  <motion.div
+                    initial={{ y: 50, opacity: 0, scale: 0.9 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    exit={{ y: 20, opacity: 0, scale: 0.95 }}
+                    transition={{ type: "spring", duration: 0.5 }}
+                    className="bg-[#0f172a] border border-slate-700 w-full max-w-4xl p-8 rounded-[2rem] shadow-2xl relative text-left overflow-y-auto max-h-[90vh]"
+                  >
+                    <button
+                      onClick={() => setShowInstructions(false)}
+                      className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-full transition-colors"
+                    >
+                      <X size={24} />
+                    </button>
+                    
+                    <h2 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+                       <BookOpen className="text-indigo-400" size={32} />
+                       How to Give Feedback
+                    </h2>
+                    <p className="text-slate-400 mb-8 border-b border-slate-800 pb-6">Follow these simple steps to successfully submit your anonymous review.</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                       {[
+                         { step: 1, title: "Access Your Link", desc: "Open the unique feedback link shared by your staff or faculty.", icon: LinkIcon, color: "text-blue-400", bg: "bg-blue-400/10" },
+                         { step: 2, title: "Sign In as Student", desc: "Click the 'Give Feedback' button on the homepage and log in securely.", icon: LogIn, color: "text-indigo-400", bg: "bg-indigo-400/10" },
+                         { step: 3, title: "Review Questions", desc: "A dashboard will appear featuring 10 distinct questions evaluating your teacher's performance.", icon: Star, color: "text-purple-400", bg: "bg-purple-400/10" },
+                         { step: 4, title: "Rate & Submit", desc: "Rate each question on a Star scale where 5 is Highest and 1 is Lowest. Attempt all questions.", icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-400/10" }
+                       ].map((item, i) => (
+                         <div key={i} className="flex gap-5 p-5 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 transition-colors">
+                            <div className={`shrink-0 w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl ${item.bg} ${item.color}`}>
+                                {item.step}
+                            </div>
+                            <div>
+                               <h3 className="text-xl font-bold text-slate-200 mb-2">{item.title}</h3>
+                               <p className="text-slate-400 text-sm leading-relaxed">{item.desc}</p>
+                            </div>
+                         </div>
+                       ))}
+                    </div>
+                    
+                    <div className="flex justify-end pt-6 border-t border-slate-800">
+                        <button
+                          onClick={() => setShowInstructions(false)}
+                          className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-colors shadow-lg shadow-indigo-600/30"
+                        >
+                          Understood!
+                        </button>
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         ) : (
           <motion.div
