@@ -269,8 +269,8 @@ function LoginContent() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mb-10">
                {[
                  { title: "100% Anonymous", desc: "Your identity is heavily encrypted and structurally decoupled from your feedback.", icon: User, color: "text-blue-400", bg: "bg-blue-500/10" },
-                 { title: "Real-time Analytics", desc: "Live dynamic thresholds and comprehensive statistical metrics for HODs.", icon: BarChart3, color: "text-indigo-400", bg: "bg-indigo-500/10" },
-                 { title: "College-wide Impact", desc: "Every rating directly contributes to global benchmark adjustments.", icon: Sparkles, color: "text-purple-400", bg: "bg-purple-500/10" }
+                 { title: "Data Science Driven", desc: "Employs statistical variance penalties and population outlier detection to threshold teacher performance.", icon: BarChart3, color: "text-indigo-400", bg: "bg-indigo-500/10" },
+                 { title: "Bias Reduction", desc: "Utilizes trimmed-mean algorithms to mathematically eliminate troll spam and rating biases.", icon: Sparkles, color: "text-purple-400", bg: "bg-purple-500/10" }
                ].map((feature, i) => (
                  <motion.div
                    initial={{ opacity: 0, y: 20 }}
