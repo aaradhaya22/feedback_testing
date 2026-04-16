@@ -44,6 +44,7 @@ interface Summary {
     needs_improvement: number;
     insufficient_data: number;
     total_teachers: number;
+    global_question_stats?: Record<string, { mean: number; std: number; threshold: number }>;
 }
 
 const COLORS: Record<string, string> = {
@@ -200,20 +201,27 @@ export default function PerformanceReport() {
         doc.setTextColor(30, 41, 59);
         doc.text("Performance Breakdown", 14, (doc as any).lastAutoTable.finalY + 15);
 
-        const parametersBody = Object.entries(teacher.question_stats).map(([key, value]) => [
-            QUESTION_LABELS[key] || key,
-            value.toString()
-        ]);
+        const parametersBody = Object.entries(teacher.question_stats).map(([key, value]) => {
+            const globalStat = summary?.global_question_stats?.[key];
+            const threshold = globalStat ? globalStat.threshold : 0;
+            const statusLabel = value < threshold ? 'X Need Improvement' : '✓ Good';
+            return [
+                QUESTION_LABELS[key] || key,
+                value.toString(),
+                statusLabel
+            ];
+        });
 
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 20,
-            head: [['Evaluation Parameter', 'Score (Out of 5)']],
+            head: [['Evaluation Parameter', 'Score (Out of 5)', 'Status']],
             body: parametersBody,
             headStyles: { fillColor: [79, 70, 229] }, // indigo-600
             alternateRowStyles: { fillColor: [249, 250, 251] },
             columnStyles: {
-                0: { cellWidth: 140 },
-                1: { cellWidth: 40, halign: 'center' }
+                0: { cellWidth: 105 },
+                1: { cellWidth: 40, halign: 'center' },
+                2: { cellWidth: 35, halign: 'center' }
             }
         });
 
@@ -617,17 +625,24 @@ export default function PerformanceReport() {
                                                     {QUESTION_LABELS[key]}
                                                 </p>
                                                 <div className="mt-2 flex items-center gap-1.5 flex-wrap">
-                                                    {value < (selectedTeacher.average_rating - (selectedTeacher.std_deviation || 0)) ? (
-                                                        <span className="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100 flex items-center gap-1">
-                                                            <X size={10} />
-                                                            Rejected
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
-                                                            <Check size={10} />
-                                                            Accepted
-                                                        </span>
-                                                    )}
+                                                    {(() => {
+                                                        const globalStat = summary?.global_question_stats?.[key];
+                                                        const threshold = globalStat ? globalStat.threshold : 0;
+                                                        if (value < threshold) {
+                                                            return (
+                                                                <span className="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100 flex items-center gap-1">
+                                                                    <X size={10} />
+                                                                    Need Improvement
+                                                                </span>
+                                                            );
+                                                        }
+                                                        return (
+                                                            <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
+                                                                <Check size={10} />
+                                                                Good
+                                                            </span>
+                                                        );
+                                                    })()}
                                                 </div>
                                             </div>
                                             {/* Score bar */}

@@ -1160,16 +1160,40 @@ def admin_teacher_report(request):
         ).order_by('-response_count')
 
         report_data = []
+        q_fields = ['Q1_Rating', 'Q2_Rating', 'Q3_Rating', 'Q4_Rating', 'Q5_Rating',
+                    'Q6_Rating', 'Q7_Rating', 'Q8_Rating', 'Q9_Rating', 'Q10_Rating']
+
+        # Calculate Global Stats for each question
+        global_question_scores = {f'q{i+1}': [] for i in range(10)}
+        all_feedbacks = feedback_qs.values_list(*q_fields)
+        
+        for row in all_feedbacks:
+            for i, val in enumerate(row):
+                if val is not None:
+                    global_question_scores[f'q{i+1}'].append(float(val))
+                    
+        global_question_stats = {}
+        for qkey, scores in global_question_scores.items():
+            if len(scores) > 0:
+                 g_mean = round(_trimmed_mean(scores), 2)
+                 g_std = round(_std_dev(scores), 2)
+            else:
+                 g_mean = 0.0
+                 g_std = 0.0
+            global_question_stats[qkey] = {
+                 'mean': g_mean,
+                 'std': g_std,
+                 'threshold': round(g_mean - g_std, 2)
+            }
+
         summary = {
             'excellent': 0,
             'good': 0,
             'needs_improvement': 0,
             'insufficient_data': 0,
-            'total_teachers': 0
+            'total_teachers': 0,
+            'global_question_stats': global_question_stats
         }
-
-        q_fields = ['Q1_Rating', 'Q2_Rating', 'Q3_Rating', 'Q4_Rating', 'Q5_Rating',
-                    'Q6_Rating', 'Q7_Rating', 'Q8_Rating', 'Q9_Rating', 'Q10_Rating']
 
         for group in teacher_groups:
             tid = group['teacher_id']
