@@ -200,20 +200,24 @@ export default function PerformanceReport() {
         doc.setTextColor(30, 41, 59);
         doc.text("Performance Breakdown", 14, (doc as any).lastAutoTable.finalY + 15);
 
+        const threshold = teacher.average_rating - (teacher.std_deviation || 0);
+
         const parametersBody = Object.entries(teacher.question_stats).map(([key, value]) => [
             QUESTION_LABELS[key] || key,
-            value.toString()
+            value.toString(),
+            value < threshold ? 'Need Improvement' : 'Good'
         ]);
 
         autoTable(doc, {
             startY: (doc as any).lastAutoTable.finalY + 20,
-            head: [['Evaluation Parameter', 'Score (Out of 5)']],
+            head: [['Evaluation Parameter', 'Score (Out of 5)', 'Status']],
             body: parametersBody,
             headStyles: { fillColor: [79, 70, 229] }, // indigo-600
             alternateRowStyles: { fillColor: [249, 250, 251] },
             columnStyles: {
-                0: { cellWidth: 140 },
-                1: { cellWidth: 40, halign: 'center' }
+                0: { cellWidth: 105 },
+                1: { cellWidth: 40, halign: 'center' },
+                2: { cellWidth: 40, halign: 'center' }
             }
         });
 
@@ -620,12 +624,12 @@ export default function PerformanceReport() {
                                                     {value < (selectedTeacher.average_rating - (selectedTeacher.std_deviation || 0)) ? (
                                                         <span className="text-[10px] font-bold text-rose-500 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-100 flex items-center gap-1">
                                                             <X size={10} />
-                                                            Rejected
+                                                            Need Improvement
                                                         </span>
                                                     ) : (
                                                         <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
                                                             <Check size={10} />
-                                                            Accepted
+                                                            Good
                                                         </span>
                                                     )}
                                                 </div>
