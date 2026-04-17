@@ -87,14 +87,15 @@ The repository is divided into two main components:
 
 ---
 
-## Key Features
+## Key Features & Analytics Engine
 
-- **Admin Dashboard**: Comprehensive view for administrators to manage teachers, classes, and feedback.
-- **Feedback Submission**: Easy-to-use interface for students to provide feedback.
-- **Real-time Reports**: Visual representation of feedback data using charts.
-- **Secure Authentication**: JWT-based login for administrators.
-- **PDF Export**: Generate and download performance reports in PDF format.
-- **Responsive Design**: Works seamlessly across desktop and mobile devices.
+This platform includes a built-in **Data Science Engine** to ensure evaluations are driven by mathematical consensus rather than strict averages.
+
+*   **Robust Statistics:** Utilizes a **Trimmed-Mean Estimator** to mathematically eliminate troll spam and rating biases.
+*   **Variance Scoring:** Calculates dataset **Standard Deviation ($\sigma$)** to dynamically cap grades for unstable or highly polarized teachers.
+*   **Unsupervised Anomaly Detection:** Establishes dynamic thresholds ($\mu - \sigma$) to automatically flag underperforming outliers relative to the college population.
+*   **Data Reliability Gating:** Enforces **Statistical Significance** checks to discard low-volume, misleading datasets.
+*   **Automated Reporting:** Real-time visual dashboards and automated PDF executive summaries using `jsPDF`.
 
 ---
 
