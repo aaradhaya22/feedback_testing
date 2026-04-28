@@ -8,7 +8,7 @@ export interface FeedbackQuestion {
 export const FEEDBACK_QUESTIONS: FeedbackQuestion[] = [
     {
         key: 'q1',
-        label: 'Teaches explains topic with examples and applications',
+        label: 'Teacher explains topic with examples and applications',
         shortLabel: 'Topic Clarity',
         category: 'Lecture'
     },
