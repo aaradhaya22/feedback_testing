@@ -9,8 +9,7 @@ from dataclasses import dataclass
 
 from django.db import transaction
 
-from archive.models import FeedbackResponseArchive
-from archive.utils import get_archive_cutoff, reset_archive_sequence
+from archive.utils import get_archive_cutoff
 from feedback_app.models import Feedback_Response, Feedback_SubmissionLog
 
 
@@ -44,27 +43,24 @@ def _eligible_response_ids(cutoff):
 
 def archive_feedback():
     """
-    Archive every feedback response older than 30 days into the archive table.
+    Mark feedback responses older than 30 days as archived.
 
     How it works
     ------------
     1. Compute the cutoff (``now - 30 days``).
     2. Find the set of source ``ResponseID`` values that are eligible (their
        submission timestamp predates the cutoff).
-    3. Look up which ``ResponseID`` values are already present in the archive
-       table and exclude them.
-    4. Copy the remaining rows into the archive table with ``is_archived=True``.
-    5. Reset the archive primary-key sequence so future auto-generated IDs do not
-       collide with the explicitly-inserted ``ResponseID`` values.
+    3. Look up which ``ResponseID`` values are already marked as archived
+       and exclude them.
+    4. Update the remaining rows with ``is_archived=True``.
 
-    Nothing is ever deleted or modified on ``feedback_response``.
+    Nothing is ever deleted. Responses are updated in-place.
 
     Duplicate prevention / idempotency
     ----------------------------------
-    The archive table reuses the source ``ResponseID`` as its primary key.
     Re-running this function re-selects the same eligible IDs, but every one of
-    them is already in the archive, so nothing is re-inserted. The PK uniqueness
-    also makes a duplicate structurally impossible at the database level.
+    them is already archived, so nothing is re-updated. The operation is safe to
+    run multiple times.
     """
     stats = ArchiveStats()
     start = time.perf_counter()
@@ -76,42 +72,22 @@ def archive_feedback():
         Feedback_SubmissionLog.objects.values_list("ResponseID", flat=True)
     )
     eligible_ids = _eligible_response_ids(cutoff)
-    existing_ids = set(
-        FeedbackResponseArchive.objects.values_list("ResponseID", flat=True)
+    already_archived_ids = set(
+        Feedback_Response.objects.filter(is_archived=True).values_list("ResponseID", flat=True)
     )
 
     stats.skipped_no_timestamp = stats.total_scanned - len(all_logged_ids)
     stats.skipped_too_recent = len(all_logged_ids - eligible_ids)
-    stats.skipped_already_archived = len(eligible_ids & existing_ids)
+    stats.skipped_already_archived = len(eligible_ids & already_archived_ids)
 
-    to_archive_ids = eligible_ids - existing_ids
+    to_archive_ids = eligible_ids - already_archived_ids
     if to_archive_ids:
         with transaction.atomic():
-            source_rows = (
-                Feedback_Response.objects.filter(ResponseID__in=to_archive_ids)
-                .values(
-                    "ResponseID",
-                    "AllocationID_id",
-                    "Q1_Rating",
-                    "Q2_Rating",
-                    "Q3_Rating",
-                    "Q4_Rating",
-                    "Q5_Rating",
-                    "Q6_Rating",
-                    "Q7_Rating",
-                    "Q8_Rating",
-                    "Q9_Rating",
-                    "Q10_Rating",
-                    "Comments",
-                )
-            )
-            archived_rows = [
-                FeedbackResponseArchive(is_archived=True, **row) for row in source_rows
-            ]
-            FeedbackResponseArchive.objects.bulk_create(archived_rows)
-            reset_archive_sequence()
+            updated = Feedback_Response.objects.filter(ResponseID__in=to_archive_ids).update(is_archived=True)
+            stats.newly_archived = updated
+    else:
+        stats.newly_archived = 0
 
-    stats.newly_archived = len(to_archive_ids)
     stats.skipped = stats.total_scanned - stats.newly_archived
     stats.execution_time_seconds = round(time.perf_counter() - start, 4)
     return stats

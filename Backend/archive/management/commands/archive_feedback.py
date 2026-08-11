@@ -4,11 +4,11 @@ Usage
 -----
     python manage.py archive_feedback
 
-The command scans ``feedback_response``, copies every record whose submission
-timestamp is older than 30 days into the archive table
-(``feedback_response_archive``), and prints a summary. It is safe to run
-repeatedly: already-archived records are skipped and no duplicates are ever
-created. No source data is deleted or modified.
+The command scans ``feedback_response``, marks every record whose submission
+timestamp is older than 30 days as archived (sets ``is_archived=True``),
+and prints a summary. It is safe to run repeatedly: already-archived
+records are skipped and no duplicates are ever created. No source data is
+deleted.
 """
 from django.core.management.base import BaseCommand
 
@@ -17,9 +17,9 @@ from archive.services import archive_feedback
 
 class Command(BaseCommand):
     help = (
-        "Copy feedback responses older than 30 days into the archive table. "
+        "Mark feedback responses older than 30 days as archived. "
         "Idempotent: already-archived records are skipped. Source data is never "
-        "modified or deleted."
+        "deleted."
     )
 
     def handle(self, *args, **options):

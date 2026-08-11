@@ -19,6 +19,7 @@ class Feedback_Response(models.Model):
     Q9_Rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     Q10_Rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     Comments = models.CharField(max_length=500, blank=True, null=True, validators=[MaxLengthValidator(500)])
+    is_archived = models.BooleanField(default=False)
 
     class Meta:
         db_table = "feedback_response"
